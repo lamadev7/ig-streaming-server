@@ -1,47 +1,35 @@
 
-import UserService from "../../../src/modules/user/services";
-import UserRepository from "../../../src/modules/user/repositories";
-import { mockSingleUser } from "../mocks/user.mocks";
+import { mockSingleUser } from "../mocks/reels.mocks";
+import ReelsService from "../../../src/modules/reels/services";
+import ReelsRepository from "../../../src/modules/reels/repositories";
 
 
-jest.mock('../../../src/modules/user/repositories');
+jest.mock('../../../src/modules/reels/repositories');
 
-describe("UserService", () => {
-    let userService: UserService;
-    let userRepositoryMock: jest.Mocked<UserRepository>;
+describe("ReelsService", () => {
+    let reelsService: ReelsService;
+    let reelsRepositoryMock: jest.Mocked<ReelsRepository>;
 
 
     beforeEach(() => {
-        userRepositoryMock = {
+        reelsRepositoryMock = {
             findOne: jest.fn()
-        } as unknown as jest.Mocked<UserRepository>;
-        userService = new UserService({ userRepository: userRepositoryMock });
+        } as unknown as jest.Mocked<ReelsRepository>;
+        reelsService = new ReelsService({ reelsRepository: reelsRepositoryMock });
     });
 
     afterEach(() => {
         jest.clearAllMocks();
     });
 
-    it('It Should return login successfull message', async () => {
-        const loginParams = { username: 'Parbat Lama', password: 'abc' };
+    it('It Should successfull upload message with status code 200', async () => {
+        const payload = {};
 
-        userRepositoryMock.findOne.mockResolvedValue(mockSingleUser);
+        reelsRepositoryMock.insertOne.mockResolvedValue(mockSingleUser);
 
-        const result = await userService.login(loginParams);
+        const result = await reelsService.upload(payload);
 
         expect(result?.data).toEqual(mockSingleUser);
-        expect(result?.error).toBeNull();
-    });
-
-    it('It Should return login failed message', async () => {
-        const loginParams = { username: 'Ram Grg', password: 'sdabc' };
-
-        const notFoundMockValue = null;
-        (userRepositoryMock.findOne as jest.Mock).mockRejectedValue(notFoundMockValue);
-            
-        const result = await userService.login(loginParams);
-
-        expect(result?.data).toBe(null);
         expect(result?.error).toBeNull();
     });
 });

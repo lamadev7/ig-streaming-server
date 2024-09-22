@@ -1,21 +1,21 @@
 import { InjectionMode, asClass, asValue, createContainer } from "awilix";
 
-import UserDao from "../modules/user/dao";
-import userModel from "../modules/user/models";
-import UserService from "../modules/user/services";
-import UserController from "../modules/user/controllers";
-import UserRepository from "../modules/user/repositories";
+import ReelsDao from "../modules/reels/dao";
+import reelsModel from "../modules/reels/models";
+import ReelsService from "../modules/reels/services";
+import ReelsController from "../modules/reels/controllers";
+import ReelsRepository from "../modules/reels/repositories";
 
 
 const container = createContainer({ injectionMode: InjectionMode.PROXY });
 
 const registerDependency = () => {
   container.register({
-    userDb: asValue(userModel),
-    userDao: asClass(UserDao),
-    userService: asClass(UserService),
-    userController: asClass(UserController),
-    userRepository: asClass(UserRepository),
+    reelsDb: asValue(reelsModel),
+    reelsDao: asClass(ReelsDao),
+    reelsService: asClass(ReelsService),
+    reelsController: asClass(ReelsController),
+    reelsRepository: asClass(ReelsRepository),
   });
 
   console.log("Dependency registered ...");

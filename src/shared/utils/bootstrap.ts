@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import config from "../../config";
 
-const initSequelizeConnection = async () => {}
+const initSequelizeConnection = async () => { }
 
 const initMongoConnection = async () => {
   await mongoose.connect(config.mongoUri)
