@@ -1,3 +1,4 @@
+import { getEncodedVideo } from "../../../shared/services/videoEncoing";
 import { IUploadReelsPayload } from "../types";
 
 
@@ -8,9 +9,11 @@ class UserService {
         this.reelsRepository = reelsRepository;
     }
 
-    async upload(params: IUploadReelsPayload) {
+    async upload(payload: IUploadReelsPayload) {
         try {
-            const res = await this.reelsRepository.insertOne(params);
+            const encodedData = getEncodedVideo(payload?.filename)
+            // const res = await this.reelsRepository.insertOne(payload);
+            const res = {};
 
             return { data: res, error: null };
 
