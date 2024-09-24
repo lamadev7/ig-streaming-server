@@ -31,15 +31,21 @@ Here’s an overview of the video upload and processing flow:
 1. **User Uploads Reel Video**: The user submits a video file via a POST request to the Node.js API.
    - The API receives the file using Multer middleware.
 
-2. **Send Video Metadata to Kafka**: The video file path and metadata (e.g., user ID, file name) are sent to a Kafka topic, ensuring the system can handle high throughput by decoupling the video upload and encoding processes.
+2. **Process the Video Using Kafka:**:
+   - Once the video is uploaded, the reel file is sent to a Kafka topic for encoding using FFmpeg.
+   - Kafka will decouple the uploading process from the encoding process to handle large-scale processing efficiently.
+     
+4. **FFmpeg Encoding:**:
+   - A separate Kafka consumer service listens for new video files.
+   - Upon receiving a video file, FFmpeg processes the video (e.g., transcodes to a different format, resolution, etc.).
 
-3. **Kafka Consumer Processes the Video**: The Kafka consumer service listens to the Kafka topic, retrieves the video metadata, and triggers the video encoding process.
+6. **Upload to S3**:
+   - Once the encoding is completed, the encoded video file is uploaded to Amazon S3.
+   - A new S3 file path is generated for the encoded video.
 
-4. **Encode Video**: The video is resized and encoded using FFmpeg into a format suitable for Instagram Reels (e.g., MP4 with a resolution of 1080x1920).
+8. **Return Response:**:
+   - Once the file is successfully uploaded to S3, a response is sent to the client with the S3 URL of the encoded video.
 
-5. **Store Metadata in MongoDB**: Once the encoding process is complete, the metadata (such as the encoded video path and upload details) is stored in MongoDB.
-
-6. **Notify Client (Optional)**: You can notify the user when the video is ready by either using WebSocket or having the client poll the server to check the status of the video processing.
 
 ## Setup Instructions
 
