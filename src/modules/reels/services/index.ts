@@ -1,4 +1,5 @@
 import { IUploadReelsPayload } from "../types";
+import { encodeVideo, uploadLocalFolderToS3 } from "../../../shared/services";
 
 
 class UserService {
@@ -8,14 +9,31 @@ class UserService {
         this.reelsRepository = reelsRepository;
     }
 
-    async upload(params: IUploadReelsPayload) {
+    async getReels() {
         try {
-            const res = await this.reelsRepository.insertOne(params);
+            const response = await this.reelsRepository.find();
 
-            return { data: res, error: null };
+            return { data: response, error: null };
 
-        } catch (error) {
-            return { data: null, error: error };
+        } catch (error: any) {
+            console.error(error)
+            return { data: null, error: error?.error };
+        }
+    }
+
+    async upload(payload: IUploadReelsPayload) {
+        try {
+            const { data }: any = await encodeVideo(payload?.filename);
+            const response = await uploadLocalFolderToS3(data?.folderName);
+
+            const entryFile = response?.find((d: any) => d.key?.includes(".mpd"));
+            const dbPayload = { url: entryFile?.Location };
+
+            const dbRes = await this.reelsRepository.insertOne(dbPayload);
+            return { data: dbRes, error: null };
+        } catch (error: any) {
+            console.error(error)
+            return { data: null, error: error?.error };
         }
     }
 }

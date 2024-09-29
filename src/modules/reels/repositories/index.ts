@@ -7,7 +7,12 @@ class ReelsRepository {
     constructor({ reelsDao }: any) {
         this.reelsDao = reelsDao;
 
+        this.find = this.find.bind(this);
         this.insertOne = this.insertOne.bind(this);
+    }
+
+    async find() {
+        return await this.reelsDao.find();
     }
 
     async insertOne(params: IUploadReelsPayload) {

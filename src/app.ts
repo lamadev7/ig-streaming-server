@@ -10,8 +10,8 @@ app.use(express.json());
 app.use(cors());
 app.use(helmet());
 
-app.get("/", (req, res) => {
-  res.send(`${process.env.NODE_ENV} Server has started....`);
+app.get("/", (_req, res) => {
+  res.sendFile(__dirname+'/modules/reels/views/index.html')
 });
 
 export default app;
