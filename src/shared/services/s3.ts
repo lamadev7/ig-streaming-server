@@ -5,8 +5,10 @@ import { getUploadFolderPath } from "../utils";
 import s3 from "../../config/s3";
 
 
-export const uploadFileToS3 = async (folderPath: string, filename: string) => {
+export const uploadFileToS3 = async ({ folderPath = getUploadFolderPath(), filename }: { folderPath?: string, filename: string }) => {
     try {
+        if (!folderPath && !filename) return;
+
         const filepath = path.join(folderPath, filename);
         const file = readFileSync(filepath);
 
@@ -26,8 +28,8 @@ export const uploadLocalFolderToS3 = async (folderName?: string) => {
         const folderPath = `${getUploadFolderPath()}${folderName}`;
         const files = readdirSync(folderPath);
 
-        const promises = files?.map((filename) => {
-            return uploadFileToS3(folderPath, filename);
+        const promises = files?.map((filename: string) => {
+            return uploadFileToS3({ folderPath, filename });
         });
 
         const response = await Promise.all(promises);

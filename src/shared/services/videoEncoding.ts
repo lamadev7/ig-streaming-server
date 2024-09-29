@@ -15,26 +15,31 @@ export const encodeVideo = (filename: string) => {
                 if (err) return reject({ data: null, error: err?.message || err });
 
                 const inputDir = `${uploadDir}${filename}`;
-                const outputDir = `${newFolderName}${filename}.mpd`;
+                const outputDir = `${newFolderName}index.m3u8`;  // The HLS output playlist (.m3u8)
 
                 if (!existsSync(inputDir)) return reject({ data: null, error: "Given file doesn't exist!" });
 
                 const videoCodec = 'libx264';
-                const videoBitrates = ['1000k', '2000k', '4000k'];
+                const videoBitrates = ['1000k', '2000k', '4000k']; // Optional bitrates if needed
                 const scaleOptions = ['scale=1280:720', 'scale=640:320'];
-                const x264Options = 'keyint=24:min-keyint=24:no-scenecut';
 
                 ffmpeg()
                     .input(inputDir)
                     .videoFilters(scaleOptions)
                     .videoCodec(videoCodec)
-                    .addOption('-x264opts', x264Options)
-                    .outputOptions('-b:v', videoBitrates[0])
-                    .format('dash')
+                    .addOption('-crf', '20') // Adjust quality, optional
+                    .addOption('-preset', 'fast') // Preset option
+                    .outputOptions([
+                        '-hls_time 10',           // Segment length in seconds
+                        '-hls_list_size 0',       // 0 = no limit to the number of playlist entries
+                        '-hls_segment_filename',  // Segment filename pattern
+                        `${newFolderName}segment_%03d.ts`,
+                    ])
+                    .format('hls')              // Output format as HLS
                     .output(outputDir)
                     .on('end', () => {
-                        console.log('DASH encoding complete.');
-                        unlink(inputDir, () => console.log('Video file removed successfully!'));
+                        console.log('HLS encoding complete.');
+                        unlink(inputDir, () => console.log('Original video file removed successfully!'));
                         resolve({ data: { folderName: filenameWithoutExtension }, error: null });
                     })
                     .on('error', (err_1) => {
@@ -47,4 +52,4 @@ export const encodeVideo = (filename: string) => {
     } catch (err) {
         console.error({ err });
     }
-}
+};

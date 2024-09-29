@@ -4,5 +4,6 @@ export const reelsDbMock = [
 
 ];
 
-export const mockSingleUser = {
+export const mockSingleReel = {
+    filename: 'abc.mp4'
 }

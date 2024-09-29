@@ -1,5 +1,5 @@
 
-import { mockSingleUser } from "../mocks/reels.mocks";
+import { mockSingleReel } from "../mocks/reels.mocks";
 import ReelsService from "../../../src/modules/reels/services";
 import ReelsRepository from "../../../src/modules/reels/repositories";
 
@@ -23,13 +23,13 @@ describe("ReelsService", () => {
     });
 
     it('It Should successfull upload message with status code 200', async () => {
-        const payload = {};
+        const payload = { filename: 'abc.mp3' };
 
-        reelsRepositoryMock.insertOne.mockResolvedValue(mockSingleUser);
+        reelsRepositoryMock.insertOne.mockResolvedValue(mockSingleReel);
 
         const result = await reelsService.upload(payload);
 
-        expect(result?.data).toEqual(mockSingleUser);
+        expect(result?.data).toEqual(mockSingleReel);
         expect(result?.error).toBeNull();
     });
 });
