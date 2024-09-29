@@ -1,5 +1,5 @@
-import { getEncodedVideo } from "../../../shared/services/videoEncoing";
 import { IUploadReelsPayload } from "../types";
+import { encodeVideo, uploadLocalFolderToS3 } from "../../../shared/services";
 
 
 class UserService {
@@ -9,16 +9,31 @@ class UserService {
         this.reelsRepository = reelsRepository;
     }
 
+    async getReels() {
+        try {
+            const response = await this.reelsRepository.find();
+
+            return { data: response, error: null };
+
+        } catch (error: any) {
+            console.error(error)
+            return { data: null, error: error?.error };
+        }
+    }
+
     async upload(payload: IUploadReelsPayload) {
         try {
-            const encodedData = getEncodedVideo(payload?.filename)
-            // const res = await this.reelsRepository.insertOne(payload);
-            const res = {};
+            const { data }: any = await encodeVideo(payload?.filename);
+            const response = await uploadLocalFolderToS3(data?.folderName);
 
-            return { data: res, error: null };
+            const entryFile = response?.find((d: any) => d.key?.includes(".mpd"));
+            const dbPayload = { url: entryFile?.Location };
 
-        } catch (error) {
-            return { data: null, error: error };
+            const dbRes = await this.reelsRepository.insertOne(dbPayload);
+            return { data: dbRes, error: null };
+        } catch (error: any) {
+            console.error(error)
+            return { data: null, error: error?.error };
         }
     }
 }
